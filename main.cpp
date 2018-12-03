@@ -20,4 +20,7 @@ int main()
 	std::vector<uint32_t> rand_arr(N_rands);
 	
 	eight_gen.populate_array_avx2_pcg32(rand_arr.data(), N_rands);	
+
+	// eightpopulate_array_avx2_pcg32
+
 }

@@ -31,6 +31,8 @@
 #include <cstring>
 #include "pcg32.hpp"
 
+#include "omp.h"
+
 #if defined(_MSC_VER)
 #  define PCG32_ALIGN(amt)    __declspec(align(amt))
 #  define PCG32_VECTORCALL    __vectorcall
@@ -58,18 +60,15 @@ protected:
 
 public:
 
-#if defined(__AVX2__)
 	// RNG state.  All values are possible.
     __m256i state[2];
     // Controls which RNG sequence (stream) is selected. Must *always* be odd.
     // The seed() function will ensure that the value of inc is odd 
     __m256i inc[2];   
-#else
-    // If we haven't got AVX2, just use the standard rng
-    std::array<pcg32, 8> rng;
-#endif
 
+    // How many 64-bit seeds we need
     static const size_t N_seeds = 16;
+    // How many 32-bit numbers we need
     static const size_t N_seed_part = 32;
     
     // Can do it one at a time
@@ -135,10 +134,6 @@ public:
 		// Same seeding process used in O'Neil's C code
 		set_seeds(init_state, init_seq);
     }
-
-
-
-#if defined(__AVX2__)
 
     // Fill the array rand_arr with pseudo-random numbers
     void populate_array_avx2_pcg32(uint32_t* rand_arr, const uint32_t size) 
@@ -335,70 +330,6 @@ private:
 
         return result;
     }
-
-// If we haven't got AVX2
-#else 
-
-    void populate_array_avx2_pcg32(uint32_t* rand_arr, const uint32_t size)
-    {
-    	uint32_t i = 0;
-
-    	// We have 8 generators, use them to fill the
-    	uint32_t total_size = size;
-    	
-    	int n_generators = 8;
-    	
-    	uint32_t blocks_per_generator = total_size/n_generators;
-
-    	uint32_t leftover = total_size - (blocks_per_generator * n_generators);
-
-	   	#pragma omp parallel
-	   	{
-			int thread_no = omp_get_thread_num();
-			uint32_t start_block = thread_no * blocks_per_generator;
-			uint32_t end_block = start_block + blocks_per_generator;
-
-			#pragma omp for
-			for(uint32_t i = start_block; i < end_block; ++i)
-	    	{
-	    		rand_arr[i] = get_rand();
-	    	}
-    	}
-
-    	if(leftover > 0)
-    	{
-    		for(uint32_t i = (size - leftover); i < leftover; ++i)
-    		{
-    			rand_arr[i] = get_rand();
-    		}
-    	}
-    }
-
-    // If we haven't got AVX just used the normal version on arrays of 8 rands at a time
-    // They don't need seeding as they're seeding automatically
-
-    // Generate 8 uniformly distributed unsigned 32-bit random numbers
-    void get_rand(uint32_t result[8]) 
-    {
-        for (int i = 0; i < 8; ++i)
-            result[i] = rng[i].get_rand();
-    }
-
-    // Generate eight single precision floating point value on the interval [0, 1)
-    void get_float(float result[8]) 
-    {
-        for (int i = 0; i < 8; ++i)
-            result[i] = rng[i].get_float();
-    }
-
-	// Generate eight double precision floating point value on the interval [0, 1)
-	void get_double(double result[8]) 
-	{
-		for (int i = 0; i < 8; ++i)
-		    result[i] = rng[i].get_double();
-	}
-
-#endif
 
 };
 
