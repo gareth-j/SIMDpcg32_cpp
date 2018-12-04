@@ -1,6 +1,6 @@
 CC = g++
 
-CFLAGS= -O3 -mavx2 -march=native -Wall -Wextra -pedantic -Wshadow
+CFLAGS= -O3 -march=native -Wall -Wextra -pedantic -Wshadow
 
 SOURCES = main.cpp
 

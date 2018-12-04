@@ -25,8 +25,6 @@
 #ifndef _PCG32_H
 #define _PCG32_H
 
-// #define PCG32_MULT 0x5851f42d4c957f2dULL
-
 #include <cstdint>
 #include <cmath>
 #include <cassert>
@@ -34,8 +32,8 @@
 
 #include "randutils.hpp"
 
-/// PCG32 Pseudorandom number generator
-
+// PCG32 Pseudorandom number generator
+// This version doesn't use the key class
 class pcg32
 {
 public:
@@ -65,6 +63,14 @@ public:
 		get_rand();
 		state += seed1;
 		get_rand();
+    }
+    
+    void populate_array_pcg32(uint32_t* rand_arr, const uint32_t size)
+    {
+        for(uint32_t i = 0; i < size; ++i)
+        {
+            rand_arr[i] = get_rand();
+        }
     }
 
     // Generate a uniformly distributed unsigned 32-bit random number
@@ -217,4 +223,4 @@ public:
 
 };
 
-#endif // __PCG32_H
+#endif // _PCG32_H

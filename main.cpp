@@ -1,10 +1,9 @@
-#include <iostream>
-
-#include "include/pcg32.hpp"
-#include "include/simd_pcg32.hpp"
+#include "include/benchmark.hpp"
 
 int main()
 {
+	// Create a 32-bit PCG PRNG
+	// The object is automatically seeded
 	pcg32 gen;
 
 	std::cout << "Some random numbers...\n";
@@ -13,14 +12,9 @@ int main()
 		std::cout << gen.get_rand() << "\n";
 	}
 
-	pcg32_8 eight_gen;
+	// Used for benchmarking the different implementations
+	benchmark my_bench;
 
-	std::size_t N_rands = 50000;
-	
-	std::vector<uint32_t> rand_arr(N_rands);
-	
-	eight_gen.populate_array_avx2_pcg32(rand_arr.data(), N_rands);	
-
-	// eightpopulate_array_avx2_pcg32
-
+	// Test each implementation
+	my_bench.run_generators();
 }
