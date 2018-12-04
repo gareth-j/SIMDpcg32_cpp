@@ -1,12 +1,10 @@
 # SIMDpcg32_cpp
 
-A vectorized C++ implementation of the 32-bit PCG pseudo-random number generator by 
-Melissa O'Neill available at http://www.pcg-random.org.
+A C++ implementation of the vectorized 32-bit PCG pseudo-random number generator by Daniel Lemire
+https://github.com/lemire/simdpcg
 
-This version is based on the work of Wenzel Jakob at https://github.com/wjakob/pcg32
-
-I've added some improved seeding functions. Will add AVX-512 implementation by
-Daniel Lemire and benchmarking code next.
+Each generator is seeded automatically using a non-deterministic seeding function
+http://www.pcg-random.org/posts/simple-portable-cpp-seed-entropy.html
 
 ## Use
 ```
@@ -60,6 +58,10 @@ Testing function : populate_array_avx512bis_pcg32_four
 ```
 
 # Acknowledgements 
-Wenzel Jakob - https://github.com/wjakob/
 
 Daniel Lemire - https://github.com/lemire/
+
+Wenzel Jakob - https://github.com/wjakob/
+
+Melissa O'Neill - http://www.pcg-random.org
+
